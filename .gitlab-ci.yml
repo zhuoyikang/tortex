@@ -7,9 +7,10 @@ stages:
 build:
   stage: build
   script:
+    - if [ -z "${FAST}" ]; then export GOPATH=/home/ubuntu/workplace_ci; fi
+    - if [ -z "${FAST}" ]; then export GOROOT=/home/ubuntu/go/go1.7; fi
+    - if [ -z "${FAST}" ]; then export PATH=$GOROOT/bin:$GOPATH/bin:$PATH; fi
     - go build
-
-
 
 deploy:
   stage: deploy
