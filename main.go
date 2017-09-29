@@ -125,7 +125,7 @@ func (r *FProxy) WaitOut() {
 		if err != nil {
 			log.Printf("WriteMessageError %v", err)
 		} else {
-			log.Printf("WriteMessage %v", string(buff))
+			//log.Printf("WriteMessage %v", string(buff))
 		}
 	}
 }
@@ -142,7 +142,7 @@ func (r *FProxy) RunOut() {
 		if n < 0 {
 			continue
 		}
-		log.Print("read out:", string(buff[0:n]))
+		//log.Print("read out:", string(buff[0:n]))
 		r.writeChan <- buff[0:n]
 	}
 }
@@ -159,7 +159,7 @@ func (r *FProxy) RunErr() {
 			continue
 		}
 
-		log.Print("read err:", string(buff[0:n]))
+		//log.Print("read err:", string(buff[0:n]))
 		r.writeChan <- buff[0:n]
 	}
 }

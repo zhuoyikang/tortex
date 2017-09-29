@@ -1,3 +1,3 @@
 # tortex
 
-go get github.com/indie21/tortex
+go get -u github.com/indie21/tortex
