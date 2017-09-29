@@ -1,0 +1,18 @@
+# 定义 stages
+stages:
+  - build
+  - deploy
+
+
+build:
+  stage: build
+  script:
+    - go build
+
+
+
+deploy:
+  stage: deploy
+  script:
+    - echo "deploy"
+
