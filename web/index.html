@@ -1,0 +1,52 @@
+<html>
+    <head>
+        <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.terminal/1.8.0/js/jquery.terminal.min.js"></script>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/jquery.terminal/1.8.0/css/jquery.terminal.min.css" rel="stylesheet"/>
+
+        <title>gly</title>
+
+        <script type="text/javascript">
+
+         var ws = new WebSocket('ws://119.29.251.168:14049/echo');
+
+         ws.onopen = function(evt) {
+             console.log('Connection open ...');
+         };
+         var echo_obj
+
+         ws.onmessage = function(evt) {
+             console.log('Received Message: ' + evt.data);
+             if(echo_obj) {
+                 echo_obj.echo(String(evt.data))
+             }
+         };
+
+         ws.onclose = function(evt) {
+             console.log('Connection closed.');
+             alert("connection closed. please F5")
+         };
+
+
+         $(document).ready(function() {
+             jQuery(function($, undefined){
+                 $('#gly').terminal(function(command) {
+                     echo_obj = this
+                     //this.echo(command)
+                     ws.send(command)
+                 }, {
+                     greetings: '',
+                     name: 'gly',
+                     height: 768,
+                     width: 1024,
+                     prompt: 'gly> '
+                 });
+             });
+
+         });
+        </script>
+    </head>
+    <body>
+        <div name="gly" id="gly"></div>
+    </body>
+</html>
