@@ -7,6 +7,8 @@ import (
 	"log"
 	"net/http"
 	"os/exec"
+	"regexp"
+	"strings"
 
 	"github.com/gorilla/websocket"
 )
@@ -107,9 +109,10 @@ func (r *FProxy) RunIn() {
 			return
 		}
 
-		log.Printf("read msg %v", string(p))
+		p1 := strings.Replace(string(p), "\n", " ", -1)
+		log.Printf("read msg %v", string(p1))
 
-		r.inPip.Write(p)
+		r.inPip.Write([]byte(p1))
 		r.inPip.Write([]byte("\n"))
 	}
 }
@@ -121,7 +124,10 @@ func (r *FProxy) WaitOut() {
 			return
 		}
 
-		err := r.conn.WriteMessage(1, buff)
+		reg := regexp.MustCompile(`\[\d+m`)
+		buff1 := reg.ReplaceAllString(string(buff), "")
+
+		err := r.conn.WriteMessage(1, []byte(buff1))
 		if err != nil {
 			log.Printf("WriteMessageError %v", err)
 		} else {
