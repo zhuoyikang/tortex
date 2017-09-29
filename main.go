@@ -120,33 +120,47 @@ func (r *FProxy) WaitOut() {
 		if status == false {
 			return
 		}
-		r.conn.WriteMessage(1, buff)
+
+		err := r.conn.WriteMessage(1, buff)
+		if err != nil {
+			log.Printf("WriteMessageError %v", err)
+		} else {
+			log.Printf("WriteMessage %v", string(buff))
+		}
 	}
 }
 
 func (r *FProxy) RunOut() {
-	buff := make([]byte, 6418)
 
 	for {
+		buff := make([]byte, 6418)
 		n, err := r.outPip.Read(buff)
 		if err != nil {
 			return
 		}
+
+		if n < 0 {
+			continue
+		}
+		log.Print("read out:", string(buff[0:n]))
 		r.writeChan <- buff[0:n]
-		//r.conn.WriteMessage(1, buff[0:n])
 	}
 }
 
 func (r *FProxy) RunErr() {
-	buff := make([]byte, 6418)
-
 	for {
+		buff := make([]byte, 6418)
 		n, err := r.errPip.Read(buff)
 		if err != nil {
 			return
 		}
+
+		if n < 0 {
+			continue
+		}
+
+		log.Print("read err:", string(buff[0:n]))
 		r.writeChan <- buff[0:n]
-		//r.conn.WriteMessage(1, buff[0:n])
 	}
 }
 
