@@ -4,7 +4,7 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.terminal/1.8.0/js/jquery.terminal.min.js"></script>
         <link href="https://cdnjs.cloudflare.com/ajax/libs/jquery.terminal/1.8.0/css/jquery.terminal.min.css" rel="stylesheet"/>
 
-        <title>gly</title>
+        <title>tortex</title>
 
         <script type="text/javascript">
 
@@ -30,16 +30,16 @@
 
          $(document).ready(function() {
              jQuery(function($, undefined){
-                 $('#gly').terminal(function(command) {
+                 $('#tortex').terminal(function(command) {
                      echo_obj = this
                      //this.echo(command)
                      ws.send(command)
                  }, {
                      greetings: '',
-                     name: 'gly',
+                     name: 'tortex',
                      height: 768,
                      width: 1024,
-                     prompt: 'gly> '
+                     prompt: 'tortex> '
                  });
              });
 
@@ -47,6 +47,6 @@
         </script>
     </head>
     <body>
-        <div name="gly" id="gly"></div>
+        <div name="tortex" id="tortex"></div>
     </body>
 </html>

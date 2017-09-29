@@ -1,6 +1,8 @@
 package main
 
 import (
+	"flag"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -8,6 +10,73 @@ import (
 
 	"github.com/gorilla/websocket"
 )
+
+var (
+	index_html = `
+<html>
+    <head>
+        <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.terminal/1.8.0/js/jquery.terminal.min.js"></script>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/jquery.terminal/1.8.0/css/jquery.terminal.min.css" rel="stylesheet"/>
+
+        <title>tortex</title>
+
+        <script type="text/javascript">
+
+         var ws = new WebSocket('ws://%s:%s/echo');
+
+         ws.onopen = function(evt) {
+             console.log('Connection open ...');
+         };
+         var echo_obj
+
+         ws.onmessage = function(evt) {
+             console.log('Received Message: ' + evt.data);
+             if(echo_obj) {
+                 echo_obj.echo(String(evt.data))
+             }
+         };
+
+         ws.onclose = function(evt) {
+             console.log('Connection closed.');
+             alert("connection closed. please F5")
+         };
+
+
+         $(document).ready(function() {
+             jQuery(function($, undefined){
+                 $('#tortex').terminal(function(command) {
+                     echo_obj = this
+                     //this.echo(command)
+                     ws.send(command)
+                 }, {
+                     greetings: '',
+                     name: 'tortex',
+                     height: 768,
+                     width: 1024,
+                     prompt: 'tortex> '
+                 });
+             });
+
+         });
+        </script>
+    </head>
+    <body>
+        <div name="tortex" id="tortex"></div>
+    </body>
+</html>
+
+`
+
+	IP   = ""
+	PORT = ""
+	CMD  = ""
+)
+
+func GetIndexHtml(ip string, port string) []byte {
+	s := fmt.Sprintf(index_html, ip, port)
+	return []byte(s)
+}
 
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
@@ -81,6 +150,10 @@ func (r *FProxy) RunErr() {
 	}
 }
 
+func index(w http.ResponseWriter, r *http.Request) {
+	w.Write(GetIndexHtml(IP, PORT))
+}
+
 func echo(w http.ResponseWriter, r *http.Request) {
 	log.Printf("new echo")
 	c, err := upgrader.Upgrade(w, r, nil)
@@ -98,8 +171,8 @@ func echo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cmd := exec.Command("gly")
-	log.Printf("gly begin")
+	cmd := exec.Command(CMD)
+	log.Printf("tortex begin")
 
 	inPip, _ := cmd.StdinPipe()
 	outPip, _ := cmd.StdoutPipe()
@@ -125,11 +198,24 @@ func echo(w http.ResponseWriter, r *http.Request) {
 	}()
 
 	cmd.Run()
-	log.Printf("gly over")
+	log.Printf("tortex over")
 }
 
 func main() {
-	http.Handle("/", http.FileServer(http.Dir("web/")))
+	//http.Handle("/", http.FileServer(http.Dir("web/")))
+	ip := (flag.String("ip", "127.0.0.1", "外网IP"))
+	port := (flag.String("port", "9090", "外网PORT"))
+	cmd := (flag.String("cmd", "ls", "托管的cmd"))
+
+	flag.Parse()
+
+	IP = *ip
+	PORT = *port
+	CMD = *cmd
+
+	log.Print(IP, " ", PORT, " ", CMD)
+
+	http.HandleFunc("/", index)
 	http.HandleFunc("/echo", echo)
 	http.ListenAndServe(":9090", nil)
 }
